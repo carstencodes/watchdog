@@ -1,4 +1,4 @@
-package main
+package notifications
 
 import (
 	"errors"
@@ -39,7 +39,7 @@ func init() {
 	flag.StringVar(&clientConfig.appToken, "gotify-app-token", "", "The gotify app token")
 	flag.StringVar(&clientConfig.baseUrl, "gotify-base-url", "", "The gotify base URL")
 
-	notification_clients["gotify"] = newGotifyClient
+	notificationClients["gotify"] = newGotifyClient
 }
 
 func newGotifyClient() (Notifier, error) {
@@ -59,10 +59,10 @@ func fromGotifyClientConfig(config gotifyConfig) (Notifier, error) {
 		return nil, parseErr
 	}
 
-	client := gotify.NewClient(baseUrl, &http.Client{})
-	auth := auth.TokenAuth(config.appToken)
+	c := gotify.NewClient(baseUrl, &http.Client{})
+	a := auth.TokenAuth(config.appToken)
 
-	gotifySender := gotifyClient{client, &auth}
+	gotifySender := gotifyClient{c, &a}
 	return gotifySender, nil
 }
 
@@ -89,18 +89,18 @@ func (gotify gotifyClient) Disconnect() error {
 }
 
 func (gotify gotifyClient) Send(msg Message, messageArgs Args) error {
-	var priority int64 = getMessagePriority(messageArgs)
+	priority := getMessagePriority(messageArgs)
 
 	messageParams := message.NewCreateMessageParams()
 	messageParams.Body = &models.MessageExternal{
-		Title:    msg.title,
-		Message:  msg.message,
+		Title:    msg.getTitle(),
+		Message:  msg.getMessage(),
 		Priority: int(priority),
 	}
 
-	_, message_err := gotify.client.Message.CreateMessage(messageParams, *gotify.auth)
+	_, messageErr := gotify.client.Message.CreateMessage(messageParams, *gotify.auth)
 
-	return message_err
+	return messageErr
 }
 
 func getMessagePriority(messageArgs Args) int64 {

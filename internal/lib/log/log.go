@@ -1,4 +1,4 @@
-package main
+package log
 
 import (
 	"io"
@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 )
 
-func createLog() *log.Logger {
-	var log = log.New(os.Stdout, "watchdog", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile|log.Lmsgprefix)
-	return log
+func CreateLog() *log.Logger {
+	var logInstance = log.New(os.Stdout, "watchdog", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile|log.Lmsgprefix)
+	return logInstance
 }
 
-func toFile(logger *log.Logger, target os.DirEntry) error {
+func ToFile(logger *log.Logger, target os.DirEntry) error {
 	var targetFile string
 	var stream io.WriteCloser
 

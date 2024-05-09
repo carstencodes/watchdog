@@ -1,18 +1,18 @@
-package main
+package metrics
 
 import "github.com/prometheus/client_golang/prometheus"
 
-type metrics struct {
-	running_containers   prometheus.Gauge
-	ignored_containers   prometheus.Gauge
-	disabled_containers  prometheus.Gauge
-	restarted_containers prometheus.Counter
-	unhealthy_containers prometheus.Gauge
+type metricsImpl struct {
+	runningContainers   prometheus.Gauge
+	ignoredContainers   prometheus.Gauge
+	disabledContainers  prometheus.Gauge
+	restartedContainers prometheus.Counter
+	unhealthyContainers prometheus.Gauge
 }
 
-func newMetrics() *metrics {
-	metrics := &metrics{
-		running_containers: prometheus.NewGauge(
+func NewMetrics() Metrics {
+	metrics := metricsImpl{
+		runningContainers: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Namespace: "watchdog",
 				Subsystem: "containers",
@@ -20,7 +20,7 @@ func newMetrics() *metrics {
 				Help:      "The amount of containers currently running on this machine",
 			},
 		),
-		ignored_containers: prometheus.NewGauge(
+		ignoredContainers: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Namespace: "watchdog",
 				Subsystem: "containers",
@@ -28,7 +28,7 @@ func newMetrics() *metrics {
 				Help:      "The number of containers ignored due to a missing health-check",
 			},
 		),
-		disabled_containers: prometheus.NewGauge(
+		disabledContainers: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Namespace: "watchdog",
 				Subsystem: "containers",
@@ -36,7 +36,7 @@ func newMetrics() *metrics {
 				Help:      "The number of containers ignored due to a container or image label",
 			},
 		),
-		restarted_containers: prometheus.NewCounter(
+		restartedContainers: prometheus.NewCounter(
 			prometheus.CounterOpts{
 				Namespace: "watchdog",
 				Subsystem: "operations",
@@ -44,7 +44,7 @@ func newMetrics() *metrics {
 				Help:      "The number of containers that were restarted by the engine",
 			},
 		),
-		unhealthy_containers: prometheus.NewGauge(
+		unhealthyContainers: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Namespace: "watchdog",
 				Subsystem: "containers",
@@ -54,15 +54,15 @@ func newMetrics() *metrics {
 		),
 	}
 
-	return metrics
+	return &metrics
 }
 
-func (met *metrics) register(registerer prometheus.Registerer) {
+func (m metricsImpl) Register(registerer prometheus.Registerer) {
 	registerer.MustRegister(
-		met.running_containers,
-		met.disabled_containers,
-		met.ignored_containers,
-		met.unhealthy_containers,
-		met.restarted_containers,
+		m.runningContainers,
+		m.disabledContainers,
+		m.ignoredContainers,
+		m.unhealthyContainers,
+		m.restartedContainers,
 	)
 }

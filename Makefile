@@ -1,12 +1,12 @@
 BINARY_NAME=watchdog
 
 build:
-	 GOARCH=amd64 GOOS=darwin go build -o ${BINARY_NAME}-darwin main.go
-	 GOARCH=amd64 GOOS=linux go build -o ${BINARY_NAME}-linux main.go
-	 GOARCH=amd64 GOOS=windows go build -o ${BINARY_NAME}-windows main.go
+	 GOARCH=amd64 GOOS=darwin go build -o ./bin/${BINARY_NAME}-darwin cmd/watchdog/main.go
+	 GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux cmd/watchdog/main.go
+	 GOARCH=amd64 GOOS=windows go build -o ./bin/${BINARY_NAME}-windows cmd/watchdog/main.go
 
 run: build
-	./${BINARY_NAME}
+	./bin/${BINARY_NAME}
 
 clean:
 	go clean

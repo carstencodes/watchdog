@@ -1,4 +1,4 @@
-package main
+package container
 
 import (
 	"context"
@@ -7,49 +7,33 @@ import (
 	"sync"
 	"time"
 
+	watchCollector "github.com/carstencodes/watchdog/internal/lib/collector"
+	watchNotifier "github.com/carstencodes/watchdog/internal/lib/notifications"
+
 	"github.com/docker/docker/api/types"
-	docker_container "github.com/docker/docker/api/types/container"
+	dockerContainer "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
-
-type container struct {
-	id       string
-	name     string
-	running  bool
-	ignored  bool
-	disabled bool
-	healthy  bool
-}
-
-type containers struct {
-	client    *client.Client
-	ctx       *context.Context
-	collector *collector
-	logger    *log.Logger
-	notifier  Notifier
-	collect   collector
-	items     []container
-}
 
 var syncRoot = sync.Mutex{}
 
 const ignoreLabel = "com.github.carstencodes.watchtower.ignore"
 
-func newContainersClient(col *collector, logger *log.Logger, notifier Notifier, coll collector, ctx *context.Context) (*containers, error) {
+func NewContainersClient(col watchCollector.Collector, logger *log.Logger, notifier watchNotifier.Notifier, ctx *context.Context) (ContainerCollection, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return nil, err
 	}
 
-	container_list := []container{}
+	container_list := []containerProxy{}
 
-	client := &containers{cli, ctx, col, logger, notifier, coll, container_list}
+	client := &containerCollectionImpl{cli, ctx, col, logger, notifier, container_list}
 
 	return client, nil
 }
 
-func (cont *containers) updateContainers() error {
-	list, err := cont.client.ContainerList(context.Background(), docker_container.ListOptions{
+func (cont containerCollectionImpl) UpdateContainers() error {
+	list, err := cont.client.ContainerList(context.Background(), dockerContainer.ListOptions{
 		All: true,
 	})
 
@@ -60,10 +44,10 @@ func (cont *containers) updateContainers() error {
 	count := len(list)
 
 	syncRoot.Lock()
-	cont.items = []container{}
+	cont.items = []containerProxy{}
 	syncRoot.Unlock()
 
-	items := make(chan container, count)
+	items := make(chan containerProxy, count)
 	wg := &sync.WaitGroup{}
 
 	wg.Add(count)
@@ -97,16 +81,13 @@ func (cont *containers) updateContainers() error {
 		}
 	}
 
-	cont.collect.metrics.disabled_containers.Set(float64(disabled))
-	cont.collect.metrics.running_containers.Set(float64(running))
-	cont.collect.metrics.ignored_containers.Set(float64(ignored))
-	cont.collect.metrics.unhealthy_containers.Set(float64(unhealthy))
+	cont.collector.CollectContainerStatistics(float64(disabled), float64(running), float64(ignored), float64(unhealthy))
 
 	return nil
 }
 
-func (cont *containers) parse_container(items chan<- container, wg *sync.WaitGroup, containerItem types.Container) {
-	result := container{}
+func (cont containerCollectionImpl) parse_container(items chan<- containerProxy, wg *sync.WaitGroup, containerItem types.Container) {
+	result := containerProxy{}
 
 	defer wg.Done()
 
@@ -143,7 +124,7 @@ func (cont *containers) parse_container(items chan<- container, wg *sync.WaitGro
 	}
 }
 
-func (cont *containers) refresh() {
+func (cont containerCollectionImpl) Refresh() {
 	syncRoot.Lock()
 	wg := &sync.WaitGroup{}
 	wg.Add(len(cont.items))
@@ -154,7 +135,7 @@ func (cont *containers) refresh() {
 	wg.Wait()
 }
 
-func (cont *containers) update_container(containerItem container, wg *sync.WaitGroup) {
+func (cont containerCollectionImpl) update_container(containerItem containerProxy, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	inspect, err := cont.client.ContainerInspect(*cont.ctx, containerItem.id)
@@ -171,9 +152,9 @@ func (cont *containers) update_container(containerItem container, wg *sync.WaitG
 	}
 }
 
-func (cont *containers) restartPending() {
+func (cont containerCollectionImpl) RestartPending() {
 	syncRoot.Lock()
-	restartables := []container{}
+	var restartables []containerProxy
 	for _, containerItem := range cont.items {
 		if (!containerItem.disabled || !containerItem.ignored) && containerItem.running && !containerItem.healthy {
 			restartables = append(restartables, containerItem)
@@ -193,22 +174,22 @@ func (cont *containers) restartPending() {
 
 	wg.Wait()
 
-	args := argsMap{map[string]string{}}
+	args := watchNotifier.NewArgsMap(map[string]string{})
 
 	cont.notifier.Send(
-		Message{
-			title:   fmt.Sprintf("Watchdog restarted %d containers", len(restartables)),
-			message: msg,
-		},
+		watchNotifier.NewMessage(
+			fmt.Sprintf("Watchdog restarted %d containers", len(restartables)),
+			msg,
+		),
 		args,
 	)
 }
 
-func (cont *containers) restartContainer(containerItem container, wg *sync.WaitGroup) {
+func (cont containerCollectionImpl) restartContainer(containerItem containerProxy, wg *sync.WaitGroup) {
 	defer wg.Done()
 	timeout := 2 * time.Minute
 	t := int(timeout.Seconds())
-	options := docker_container.StopOptions{
+	options := dockerContainer.StopOptions{
 		Signal:  "",
 		Timeout: &t,
 	}
@@ -221,5 +202,5 @@ func (cont *containers) restartContainer(containerItem container, wg *sync.WaitG
 		// TODO measure
 	}
 
-	cont.collect.metrics.restarted_containers.Inc()
+	cont.collector.ContainerRestarted()
 }

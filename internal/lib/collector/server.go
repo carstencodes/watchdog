@@ -1,18 +1,14 @@
-package main
+package collector
 
 import (
 	"context"
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
-	"regexp"
 	"sync"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -26,41 +22,14 @@ var (
 )
 
 var (
-	protect_server sync.Mutex = sync.Mutex{}
+	protectServer = sync.Mutex{}
 )
 
 func init() {
 	flag.IntVar(&port, "port", defaultPort, "The tcp port to listen to")
 }
 
-type collector struct {
-	logger  *log.Logger
-	metrics *metrics
-	reg     *prometheus.Registry
-	server  *http.Server
-}
-
-func NewCollector(logger *log.Logger) *collector {
-	col := &collector{
-		logger,
-		newMetrics(),
-		prometheus.NewRegistry(),
-		nil,
-	}
-
-	return col
-}
-
-func (col *collector) init() {
-	col.metrics.register(col.reg)
-	col.reg.MustRegister(collectors.NewBuildInfoCollector())
-	col.reg.MustRegister(collectors.NewGoCollector(
-		collectors.WithGoCollectorRuntimeMetrics(
-			collectors.GoRuntimeMetricsRule{Matcher: regexp.MustCompile("/.*")}),
-	))
-}
-
-func (col *collector) startServer(ctx *context.Context) error {
+func (col collectorImpl) StartServer(ctx *context.Context) error {
 	const listenerAddressFamily string = "tcp"
 
 	addr := fmt.Sprintf(":%d", port)
@@ -79,7 +48,7 @@ func (col *collector) startServer(ctx *context.Context) error {
 
 	mux.Handle(endpoint, httpHandler)
 
-	protect_server.Lock()
+	protectServer.Lock()
 	col.server = &http.Server{
 		Addr:     addr,
 		Handler:  mux,
@@ -88,19 +57,19 @@ func (col *collector) startServer(ctx *context.Context) error {
 			return *ctx
 		},
 	}
-	protect_server.Unlock()
+	protectServer.Unlock()
 
 	go runServer(col.server, listener)
 
 	return nil
 }
 
-func (col *collector) stopServer(ctx *context.Context) error {
+func (col collectorImpl) StopServer(ctx *context.Context) error {
 	if col.server != nil {
-		protect_server.Lock()
+		protectServer.Lock()
 		err := col.server.Shutdown(*ctx)
 		col.server = nil
-		protect_server.Unlock()
+		protectServer.Unlock()
 		return err
 	}
 
