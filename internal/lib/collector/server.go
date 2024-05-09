@@ -48,18 +48,20 @@ func (col collectorImpl) StartServer(ctx *context.Context) error {
 
 	mux.Handle(endpoint, httpHandler)
 
+	childContext, cancelWithCause := context.WithCancelCause(*ctx)
+
 	protectServer.Lock()
 	col.server = &http.Server{
 		Addr:     addr,
 		Handler:  mux,
 		ErrorLog: col.logger.Error().GetLog(),
-		BaseContext: func(_ net.Listener) context.Context {
-			return *ctx
+		BaseContext: func(listener net.Listener) context.Context {
+			return context.WithValue(childContext, "watchdog.server.listener", listener)
 		},
 	}
 	protectServer.Unlock()
 
-	go runServer(col.server, listener)
+	go runServer(col.server, listener, cancelWithCause)
 
 	return nil
 }
@@ -76,11 +78,9 @@ func (col collectorImpl) StopServer(ctx *context.Context) error {
 	return nil
 }
 
-func runServer(server *http.Server, listener net.Listener) error {
-	server_error := server.Serve(listener)
-	if !errors.Is(server_error, http.ErrServerClosed) {
-		return server_error
+func runServer(server *http.Server, listener net.Listener, causeFunc context.CancelCauseFunc) {
+	serverError := server.Serve(listener)
+	if !errors.Is(serverError, http.ErrServerClosed) {
+		causeFunc(serverError)
 	}
-
-	return nil
 }
