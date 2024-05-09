@@ -27,4 +27,4 @@ vet:
 	go vet
 
 lint:
-	golangci-lint run --enable-all
+	golangci-lint run --enable-all --out-format json --sort-results | jq .Issues
