@@ -18,13 +18,15 @@ import (
 )
 
 type gotifyConfig struct {
-	baseUrl  string
-	appToken string
+	baseUrl         string
+	appToken        string
+	defaultPriority int64
 }
 
 type gotifyClient struct {
 	client *client.GotifyREST
 	auth   *runtime.ClientAuthInfoWriter
+	config gotifyConfig
 }
 
 type gotifyMessageArgs struct {
@@ -40,6 +42,7 @@ var (
 func init() {
 	flag.StringVar(&clientConfig.appToken, "gotify-app-token", "", "The gotify app token")
 	flag.StringVar(&clientConfig.baseUrl, "gotify-base-url", "", "The gotify base URL")
+	flag.Int64Var(&clientConfig.defaultPriority, "gotify-default-priority", 5, "The default message priority")
 
 	notificationClients["gotify"] = newGotifyClient
 }
@@ -64,7 +67,7 @@ func fromGotifyClientConfig(config gotifyConfig) (Notifier, error) {
 	c := gotify.NewClient(baseUrl, &http.Client{})
 	a := auth.TokenAuth(config.appToken)
 
-	gotifySender := gotifyClient{c, &a}
+	gotifySender := gotifyClient{c, &a, config}
 	return gotifySender, nil
 }
 
@@ -88,6 +91,10 @@ func (gotify gotifyClient) Connect() error {
 
 func (gotify gotifyClient) Disconnect() error {
 	return nil
+}
+
+func (gotify gotifyClient) CreateDefaultArgs() Args {
+	return newGotifyArgs(gotify.config.defaultPriority)
 }
 
 func (gotify gotifyClient) Send(msg Message, messageArgs Args) error {

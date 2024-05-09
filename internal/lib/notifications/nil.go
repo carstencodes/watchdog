@@ -18,8 +18,12 @@ func (nn nullNotifier) Disconnect() error {
 	return nil
 }
 
-func (nn nullNotifier) Send(msg Message, messageArgs Args) error {
+func (nn nullNotifier) Send(_ Message, _ Args) error {
 	return nil
+}
+
+func (nn nullNotifier) CreateDefaultArgs() Args {
+	return NewArgsMap(map[string]string{})
 }
 
 func init() {

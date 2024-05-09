@@ -27,9 +27,9 @@ func NewContainersClient(col watchCollector.Collector, logger watchLog.Log, noti
 
 	container_list := []containerProxy{}
 
-	client := &containerCollectionImpl{cli, ctx, col, logger, notifier, container_list}
+	collection := &containerCollectionImpl{cli, ctx, col, logger, notifier, container_list}
 
-	return client, nil
+	return collection, nil
 }
 
 func (cont containerCollectionImpl) UpdateContainers() error {
@@ -180,7 +180,7 @@ func (cont containerCollectionImpl) RestartPending() {
 
 	args := watchNotifier.NewArgsMap(map[string]string{})
 
-	cont.notifier.Send(
+	_ = cont.notifier.Send(
 		watchNotifier.NewMessage(
 			fmt.Sprintf("Watchdog restarted %d containers", len(restartables)),
 			msg,

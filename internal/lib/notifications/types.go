@@ -15,6 +15,7 @@ type Notifier interface {
 	Connect() error
 	Disconnect() error
 	Send(message Message, messageArgs Args) error
+	CreateDefaultArgs() Args
 }
 
 type NotifierCreatorFunc func(log watchLog.Log) (Notifier, error)
