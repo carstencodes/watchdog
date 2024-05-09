@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	docker_container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
 
@@ -48,7 +49,7 @@ func newContainersClient(col *collector, logger *log.Logger, notifier Notifier, 
 }
 
 func (cont *containers) updateContainers() error {
-	list, err := cont.client.ContainerList(context.Background(), types.ContainerListOptions{
+	list, err := cont.client.ContainerList(context.Background(), docker_container.ListOptions{
 		All: true,
 	})
 
@@ -206,7 +207,12 @@ func (cont *containers) restartPending() {
 func (cont *containers) restartContainer(containerItem container, wg *sync.WaitGroup) {
 	defer wg.Done()
 	timeout := 2 * time.Minute
-	err := cont.client.ContainerRestart(*cont.ctx, containerItem.id, &timeout)
+	t := int(timeout.Seconds())
+	options := docker_container.StopOptions{
+		Signal:  "",
+		Timeout: &t,
+	}
+	err := cont.client.ContainerRestart(*cont.ctx, containerItem.id, options)
 	if err != nil {
 		// TODO log
 	}
