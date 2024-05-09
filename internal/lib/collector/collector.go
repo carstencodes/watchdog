@@ -1,24 +1,24 @@
 package collector
 
 import (
-	"log"
 	"net/http"
 	"regexp"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
 	watchMetrics "github.com/carstencodes/watchdog/internal/lib/metrics"
 )
 
 type collectorImpl struct {
-	logger  *log.Logger
+	logger  watchLog.Log
 	metrics watchMetrics.Metrics
 	reg     *prometheus.Registry
 	server  *http.Server
 }
 
-func NewCollector(logger *log.Logger) Collector {
+func NewCollector(logger watchLog.Log) Collector {
 	col := &collectorImpl{
 		logger,
 		watchMetrics.NewMetrics(),

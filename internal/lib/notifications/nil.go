@@ -1,8 +1,12 @@
 package notifications
 
+import (
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
+)
+
 type nullNotifier struct{}
 
-func newNullNotifier() (Notifier, error) {
+func newNullNotifier(_ watchLog.Log) (Notifier, error) {
 	return nullNotifier{}, nil
 }
 

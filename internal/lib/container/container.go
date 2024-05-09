@@ -3,11 +3,11 @@ package container
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
 	watchCollector "github.com/carstencodes/watchdog/internal/lib/collector"
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
 	watchNotifier "github.com/carstencodes/watchdog/internal/lib/notifications"
 
 	"github.com/docker/docker/api/types"
@@ -19,7 +19,7 @@ var syncRoot = sync.Mutex{}
 
 const ignoreLabel = "com.github.carstencodes.watchtower.ignore"
 
-func NewContainersClient(col watchCollector.Collector, logger *log.Logger, notifier watchNotifier.Notifier, ctx *context.Context) (ContainerCollection, error) {
+func NewContainersClient(col watchCollector.Collector, logger watchLog.Log, notifier watchNotifier.Notifier, ctx *context.Context) (ContainerCollection, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return nil, err

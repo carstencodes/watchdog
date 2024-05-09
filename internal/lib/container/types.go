@@ -2,11 +2,11 @@ package container
 
 import (
 	"context"
-	"log"
 
 	"github.com/docker/docker/client"
 
 	watchCollector "github.com/carstencodes/watchdog/internal/lib/collector"
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
 	watchNotifier "github.com/carstencodes/watchdog/internal/lib/notifications"
 )
 
@@ -29,7 +29,7 @@ type containerCollectionImpl struct {
 	client    *client.Client
 	ctx       *context.Context
 	collector watchCollector.Collector
-	logger    *log.Logger
+	logger    watchLog.Log
 	notifier  watchNotifier.Notifier
 	items     []containerProxy
 }

@@ -1,5 +1,9 @@
 package notifications
 
+import (
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
+)
+
 type Args interface {
 	GetBool(key string) (bool, error)
 	GetFloat(key string) (float64, error)
@@ -13,4 +17,4 @@ type Notifier interface {
 	Send(message Message, messageArgs Args) error
 }
 
-type NotifierCreatorFunc func() (Notifier, error)
+type NotifierCreatorFunc func(log watchLog.Log) (Notifier, error)

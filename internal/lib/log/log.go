@@ -1,42 +1,32 @@
 package log
 
-import (
-	"io"
-	"log"
-	"os"
-	"path/filepath"
-)
+func CreateLog(minLevel Level, setup Setup) (Log, error) {
+	levels := getLogLevel(minLevel)
+	writer, err := setup.Build()
+	if err != nil {
+		return nil, err
+	}
 
-func CreateLog() *log.Logger {
-	var logInstance = log.New(os.Stdout, "watchdog", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile|log.Lmsgprefix)
-	return logInstance
+	return newLogShell(levels, writer), nil
 }
 
-func ToFile(logger *log.Logger, target os.DirEntry) error {
-	var targetFile string
-	var stream io.WriteCloser
-
-	if target.IsDir() {
-		targetFile = filepath.Join(target.Name(), "watchdog.log")
-	} else {
-		targetFile = target.Name()
+func getLogLevel(minLevel Level) []Level {
+	var levels []Level
+	switch minLevel {
+	case Debug:
+		levels = append(levels, Debug)
+		fallthrough
+	case Info:
+		levels = append(levels, Info)
+		fallthrough
+	case Warning:
+		levels = append(levels, Warning)
+		fallthrough
+	case Error:
+		levels = append(levels, Error)
+		fallthrough
+	case Fatal:
+		levels = append(levels, Fatal)
 	}
-
-	_, err := os.Stat(targetFile)
-	if os.IsNotExist(err) {
-		stream, err = os.Create(targetFile)
-		if err != nil {
-			return err
-		}
-	} else {
-		stream, err = os.Open(targetFile)
-		if err != nil {
-			return err
-		}
-	}
-
-	targetWriter := io.MultiWriter(os.Stdout, stream)
-	logger.SetOutput(targetWriter)
-
-	return nil
+	return levels
 }

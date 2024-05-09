@@ -4,6 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
 )
 
 var notificationClient string
@@ -13,12 +15,12 @@ func init() {
 	flag.StringVar(&notificationClient, "notify", "", "The notification client")
 }
 
-func GetNotificationClient() (Notifier, error) {
+func GetNotificationClient(log watchLog.Log) (Notifier, error) {
 	creator, present := notificationClients[notificationClient]
 
 	if !present {
 		return nil, errors.New(fmt.Sprintf("Unknown notification client: %s", notificationClient))
 	}
 
-	return creator()
+	return creator(log)
 }

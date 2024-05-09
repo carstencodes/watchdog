@@ -52,7 +52,7 @@ func (col collectorImpl) StartServer(ctx *context.Context) error {
 	col.server = &http.Server{
 		Addr:     addr,
 		Handler:  mux,
-		ErrorLog: col.logger,
+		ErrorLog: col.logger.Error().GetLog(),
 		BaseContext: func(_ net.Listener) context.Context {
 			return *ctx
 		},

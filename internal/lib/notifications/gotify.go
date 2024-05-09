@@ -13,6 +13,8 @@ import (
 	"github.com/gotify/go-api-client/v2/client/message"
 	"github.com/gotify/go-api-client/v2/gotify"
 	"github.com/gotify/go-api-client/v2/models"
+
+	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
 )
 
 type gotifyConfig struct {
@@ -42,7 +44,7 @@ func init() {
 	notificationClients["gotify"] = newGotifyClient
 }
 
-func newGotifyClient() (Notifier, error) {
+func newGotifyClient(_ watchLog.Log) (Notifier, error) {
 	return fromGotifyClientConfig(clientConfig)
 }
 
