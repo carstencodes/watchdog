@@ -50,26 +50,28 @@ func (cont containerCollectionImpl) UpdateContainers() error {
 	items := make(chan containerProxy, count)
 	wg := &sync.WaitGroup{}
 
-	wg.Add(count)
-
-	for _, cnt := range list {
-		go cont.parse_container(items, wg, cnt)
-	}
-
-	wg.Wait()
-
 	disabled := 0
 	running := 0
 	ignored := 0
 	unhealthy := 0
 
-	for item := range items {
-		syncRoot.Lock()
-		cont.items = append(cont.items, item)
-		syncRoot.Unlock()
-		if item.disabled {
+	for _, cnt := range list {
+		disable, found := cnt.Labels[ignoreLabel]
+		isDisabled := found && disable == "false"
+		if !isDisabled {
+			wg.Add(1)
+			go cont.parse_container(items, wg, cnt.ID)
+		} else {
 			disabled += 1
 		}
+	}
+
+	wg.Wait()
+	close(items)
+
+	var resolvedItems []containerProxy
+	for item := range items {
+		resolvedItems = append(resolvedItems, item)
 		if item.ignored {
 			ignored += 1
 		}
@@ -81,12 +83,16 @@ func (cont containerCollectionImpl) UpdateContainers() error {
 		}
 	}
 
+	syncRoot.Lock()
+	cont.items = resolvedItems
+	syncRoot.Unlock()
+
 	cont.collector.CollectContainerStatistics(float64(disabled), float64(running), float64(ignored), float64(unhealthy))
 
 	return nil
 }
 
-func (cont containerCollectionImpl) parse_container(items chan<- containerProxy, wg *sync.WaitGroup, containerItem types.Container) {
+func (cont containerCollectionImpl) parse_container(items chan<- containerProxy, wg *sync.WaitGroup, containerId string) {
 	result := containerProxy{}
 
 	defer wg.Done()
@@ -100,17 +106,9 @@ func (cont containerCollectionImpl) parse_container(items chan<- containerProxy,
 	result.disabled = true
 	result.healthy = true
 
-	result.id = containerItem.ID
-	if len(containerItem.Names) > 0 {
-		result.name = containerItem.Names[0]
-	} else {
-		result.name = ""
-	}
+	result.id = containerId
 
-	disable, found := containerItem.Labels[ignoreLabel]
-	result.disabled = found && disable == "false"
-
-	inspect, err := cont.client.ContainerInspect(*cont.ctx, containerItem.ID)
+	inspect, err := cont.client.ContainerInspect(*cont.ctx, containerId)
 	if err != nil {
 		// TODO log
 		return
@@ -120,7 +118,13 @@ func (cont containerCollectionImpl) parse_container(items chan<- containerProxy,
 	if state != nil {
 		result.running = state.Running
 		result.ignored = state.Health == nil
-		result.healthy = state.Health.Status == types.Healthy || state.Health.Status == types.Starting
+		result.healthy = state.Health == nil || (state.Health.Status == types.Healthy || state.Health.Status == types.Starting)
+	}
+
+	if len(inspect.Name) > 0 {
+		result.name = inspect.Name
+	} else {
+		result.name = ""
 	}
 }
 
