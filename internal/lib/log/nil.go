@@ -7,9 +7,9 @@ import (
 type nilLogger struct {
 }
 
-func (n nilLogger) Printf(format string, args ...interface{}) {}
+func (n nilLogger) Printf(_ string, _ ...interface{}) {}
 
-func NewNilLogger() Logger {
+func newNilLogger() Logger {
 	return &nilLogger{}
 }
 

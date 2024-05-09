@@ -16,7 +16,7 @@ func newLogShell(levels []Level, writer io.Writer) logShell {
 
 	for _, level := range allLevels {
 		if _, found := loggers[level]; !found {
-			loggers[level] = nilLogger{}
+			loggers[level] = newNilLogger()
 		}
 	}
 
@@ -28,7 +28,7 @@ func (l logShell) Debug() Logger {
 		return l
 	}
 
-	return nilLogger{}
+	return newNilLogger()
 }
 
 func (l logShell) Info() Logger {
@@ -36,7 +36,7 @@ func (l logShell) Info() Logger {
 		return l
 	}
 
-	return nilLogger{}
+	return newNilLogger()
 }
 
 func (l logShell) Warning() Logger {
@@ -44,7 +44,7 @@ func (l logShell) Warning() Logger {
 		return l
 	}
 
-	return nilLogger{}
+	return newNilLogger()
 }
 
 func (l logShell) Error() Logger {
@@ -52,7 +52,7 @@ func (l logShell) Error() Logger {
 		return l
 	}
 
-	return nilLogger{}
+	return newNilLogger()
 }
 
 func (l logShell) Fatal() Logger {
@@ -60,5 +60,5 @@ func (l logShell) Fatal() Logger {
 		return l
 	}
 
-	return nilLogger{}
+	return newNilLogger()
 }
