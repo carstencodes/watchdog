@@ -9,8 +9,8 @@ type loggerImpl struct {
 	logger *log.Logger
 }
 
-func newLogger(level Level, writer io.Writer) Logger {
-	lg := log.New(writer, "watchdog "+string(level)+": ", log.Ldate|log.Ltime|log.LUTC|log.Llongfile|log.Lmsgprefix)
+func newLogger(level Level, applicationName string, writer io.Writer) Logger {
+	lg := log.New(writer, applicationName+" "+string(level)+": ", log.Ldate|log.Ltime|log.LUTC|log.Llongfile|log.Lmsgprefix)
 
 	if level == Fatal {
 		return newFatalLogger(lg)

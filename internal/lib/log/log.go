@@ -1,13 +1,17 @@
 package log
 
-func CreateLog(minLevel Level, setup Setup) (Log, error) {
+import (
+	"github.com/carstencodes/watchdog/internal/lib/common"
+)
+
+func CreateLog(minLevel Level, info common.ApplicationDetails, setup Setup) (Log, error) {
 	levels := getLogLevel(minLevel)
 	writer, err := setup.Build()
 	if err != nil {
 		return nil, err
 	}
 
-	return newLogShell(levels, writer), nil
+	return newLogShell(levels, info, writer), nil
 }
 
 func getLogLevel(minLevel Level) []Level {

@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	watchCollector "github.com/carstencodes/watchdog/internal/lib/collector"
+	"github.com/carstencodes/watchdog/internal/lib/common"
 	watchContainer "github.com/carstencodes/watchdog/internal/lib/container"
 	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
 	"github.com/carstencodes/watchdog/internal/lib/log/sinks"
@@ -18,6 +19,7 @@ import (
 type App struct {
 	context  appContext
 	services appServices
+	details  common.ApplicationDetails
 }
 
 type appContext struct {
@@ -34,14 +36,16 @@ type appServices struct {
 }
 
 func NewApp() (*App, error) {
-	var notifier watchNotifier.Notifier
+	details := common.ApplicationInfo()
 
-	lg, err := watchLog.CreateLog(watchLog.Info, watchLog.NewSetup().WithSink(sinks.StdOut()))
+	lg, err := watchLog.CreateLog(watchLog.Info, details, watchLog.NewSetup().WithSink(sinks.StdOut()))
 	if err != nil {
 		return nil, err
 	}
+	lg.Info().Printf("Starting %s %s, %s", details.Name(), details.Version(), details.Copyright())
 
 	var col = watchCollector.NewCollector(lg)
+	var notifier watchNotifier.Notifier
 	notifier, err = watchNotifier.GetNotificationClient(lg)
 
 	if err != nil {
@@ -65,7 +69,7 @@ func NewApp() (*App, error) {
 		lg, notifier, col, containers, worker,
 	}
 
-	app := App{appCtx, appSvc}
+	app := App{appCtx, appSvc, details}
 
 	go func() {
 		<-c
@@ -95,5 +99,6 @@ func (app App) Run() error {
 }
 
 func (app App) Terminate() {
+	app.services.logger.Info().Printf("Shutdown signal receiver. Terminating application.")
 	app.context.cancel()
 }

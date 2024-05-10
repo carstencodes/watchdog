@@ -2,16 +2,18 @@ package log
 
 import (
 	"io"
+
+	"github.com/carstencodes/watchdog/internal/lib/common"
 )
 
 type logShell struct {
 	loggers map[Level]Logger
 }
 
-func newLogShell(levels []Level, writer io.Writer) logShell {
+func newLogShell(levels []Level, info common.ApplicationDetails, writer io.Writer) logShell {
 	loggers := make(map[Level]Logger)
 	for _, level := range levels {
-		loggers[level] = newLogger(level, writer)
+		loggers[level] = newLogger(level, info.Name(), writer)
 	}
 
 	for _, level := range allLevels {
