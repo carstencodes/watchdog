@@ -1,26 +1,24 @@
-package log
+package sinks
 
 import (
 	"io"
-
-	"github.com/carstencodes/watchdog/internal/lib/log/sinks"
 )
 
 type Setup interface {
-	WithSink(sink sinks.Sink, err error) Setup
+	WithSink(sink Sink, err error) Setup
 	Build() (io.Writer, error)
 }
 
 type setupImpl struct {
-	sinks []sinks.Sink
+	sinks []Sink
 	err   error
 }
 
-func NewSetup() Setup {
-	return &setupImpl{[]sinks.Sink{}, nil}
+func newSetup() Setup {
+	return &setupImpl{[]Sink{}, nil}
 }
 
-func (s *setupImpl) WithSink(sink sinks.Sink, err error) Setup {
+func (s *setupImpl) WithSink(sink Sink, err error) Setup {
 	if s.err != nil {
 		return s
 	}

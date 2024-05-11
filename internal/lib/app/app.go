@@ -11,7 +11,6 @@ import (
 	"github.com/carstencodes/watchdog/internal/lib/common"
 	watchContainer "github.com/carstencodes/watchdog/internal/lib/container"
 	watchLog "github.com/carstencodes/watchdog/internal/lib/log"
-	"github.com/carstencodes/watchdog/internal/lib/log/sinks"
 	watchNotifier "github.com/carstencodes/watchdog/internal/lib/notifications"
 	watchWorker "github.com/carstencodes/watchdog/internal/lib/worker"
 )
@@ -38,7 +37,7 @@ type appServices struct {
 func NewApp() (*App, error) {
 	details := common.ApplicationInfo()
 
-	lg, err := watchLog.CreateLog(details, watchLog.NewSetup().WithSink(sinks.StdOut()))
+	lg, err := watchLog.CreateLog(details)
 	if err != nil {
 		return nil, err
 	}

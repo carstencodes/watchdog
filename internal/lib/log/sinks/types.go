@@ -4,10 +4,6 @@ import (
 	"io"
 )
 
-type SinkSetup interface {
-	SetSinks(sinks ...[]Sink)
-}
-
 type Sink interface {
 	GetWriter() io.Writer
 }
@@ -18,4 +14,12 @@ type streamSinkImpl struct {
 
 func (s streamSinkImpl) GetWriter() io.Writer {
 	return s.writer
+}
+
+var allSinks []sinkFactory
+
+type sinkFactory interface {
+	Name() string
+	SupportsSink(s string) bool
+	CreateSink(s string) (Sink, error)
 }

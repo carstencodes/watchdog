@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/carstencodes/watchdog/internal/lib/common"
+	"github.com/carstencodes/watchdog/internal/lib/log/sinks"
 )
 
 var level = logLevelVar{Info}
@@ -38,10 +39,10 @@ func init() {
 	flag.Var(&level, "log-level", "Select the log level to use. Must be one of: debug, info, warning, error, fatal")
 }
 
-func CreateLog(info common.ApplicationDetails, setup Setup) (Log, error) {
+func CreateLog(info common.ApplicationDetails) (Log, error) {
 	minLevel := level.levelValue
 	levels := getLogLevel(minLevel)
-	writer, err := setup.Build()
+	writer, err := sinks.CreateSink()
 	if err != nil {
 		return nil, err
 	}
