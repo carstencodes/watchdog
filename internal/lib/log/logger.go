@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"io"
 	"log"
 )
@@ -20,7 +21,11 @@ func newLogger(level Level, applicationName string, writer io.Writer) Logger {
 }
 
 func (l loggerImpl) Printf(format string, args ...interface{}) {
-	l.logger.Printf(format, args...)
+	message := fmt.Sprintf(format, args...)
+	err := l.logger.Output(2, message)
+	if err != nil {
+		l.logger.Printf(format, args...) // log anyway - ignore error
+	}
 }
 
 func (l loggerImpl) GetLog() *log.Logger {
