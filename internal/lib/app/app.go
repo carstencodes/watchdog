@@ -80,24 +80,34 @@ func NewApp() (*App, error) {
 
 func (app App) Run() error {
 	flag.Parse()
+	app.services.logger.Debug().Printf("Initialize collector.")
 	app.services.collector.Init()
+	app.services.logger.Debug().Printf("Initialize container collection.")
 	err := app.services.containers.UpdateContainers()
 	if err != nil {
 		return err
 	}
+	app.services.logger.Debug().Printf("Refreshing container list.")
 	app.services.containers.Refresh()
+	app.services.logger.Debug().Printf("Starting worker.")
 	app.services.worker.Start()
+	app.services.logger.Debug().Printf("Starting Worker.")
 	err = app.services.collector.Server().StartServer(app.context.ctx)
 	if err != nil {
 		return err
 	}
 
+	app.services.logger.Info().Printf("Application started successfully.")
+
 	<-(*app.context.ctx).Done()
+	app.services.logger.Debug().Printf("Stopping worker.")
 	app.services.worker.Stop()
+	app.services.logger.Info().Printf("Application terminated.")
 	return nil
 }
 
 func (app App) Terminate() {
-	app.services.logger.Info().Printf("Shutdown signal receiver. Terminating application.")
+	app.services.logger.Info().Printf("Shutdown signal received. Terminating application.")
 	app.context.cancel()
+	app.services.logger.Debug().Printf("Context canceled.")
 }
