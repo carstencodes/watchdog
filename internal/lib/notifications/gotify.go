@@ -40,9 +40,9 @@ var (
 )
 
 func init() {
-	flag.StringVar(&clientConfig.appToken, "gotify-app-token", "", "The gotify app token")
-	flag.StringVar(&clientConfig.baseUrl, "gotify-base-url", "", "The gotify base URL")
-	flag.Int64Var(&clientConfig.defaultPriority, "gotify-default-priority", 5, "The default message priority")
+	flag.StringVar(&clientConfig.appToken, "gotify-app-token", "", "The gotify app token to use, if notification client is set to 'gotify'")
+	flag.StringVar(&clientConfig.baseUrl, "gotify-base-url", "", "The gotify base URL to send messages to, if notification client is set to 'gotify'")
+	flag.Int64Var(&clientConfig.defaultPriority, "gotify-default-priority", 5, "The default message priority to use if notification client is set to 'gotify'")
 
 	notificationClients["gotify"] = newGotifyClient
 }

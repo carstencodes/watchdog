@@ -38,7 +38,7 @@ type appServices struct {
 func NewApp() (*App, error) {
 	details := common.ApplicationInfo()
 
-	lg, err := watchLog.CreateLog(watchLog.Info, details, watchLog.NewSetup().WithSink(sinks.StdOut()))
+	lg, err := watchLog.CreateLog(details, watchLog.NewSetup().WithSink(sinks.StdOut()))
 	if err != nil {
 		return nil, err
 	}

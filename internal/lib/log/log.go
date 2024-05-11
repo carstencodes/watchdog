@@ -1,10 +1,45 @@
 package log
 
 import (
+	"flag"
+	"fmt"
+	"strings"
+
 	"github.com/carstencodes/watchdog/internal/lib/common"
 )
 
-func CreateLog(minLevel Level, info common.ApplicationDetails, setup Setup) (Log, error) {
+var level = logLevelVar{Info}
+
+type logLevelVar struct {
+	levelValue Level
+}
+
+func (l logLevelVar) String() string {
+	for key, value := range levelMap {
+		if value == l.levelValue {
+			return key
+		}
+	}
+
+	return string(l.levelValue)
+}
+
+func (l logLevelVar) Set(value string) error {
+	value = strings.ToLower(value)
+	if newLevel, ok := levelMap[value]; ok {
+		l.levelValue = newLevel
+		return nil
+	} else {
+		return fmt.Errorf("unknown log level '%s'", value)
+	}
+}
+
+func init() {
+	flag.Var(&level, "log-level", "Select the log level to use. Must be one of: debug, info, warning, error, fatal")
+}
+
+func CreateLog(info common.ApplicationDetails, setup Setup) (Log, error) {
+	minLevel := level.levelValue
 	levels := getLogLevel(minLevel)
 	writer, err := setup.Build()
 	if err != nil {

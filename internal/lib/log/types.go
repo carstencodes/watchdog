@@ -15,6 +15,14 @@ var allLevels = []Level{
 	Debug, Info, Warning, Error, Fatal,
 }
 
+var levelMap = map[string]Level{
+	"debug":   Debug,
+	"info":    Info,
+	"warning": Warning,
+	"error":   Error,
+	"fatal":   Fatal,
+}
+
 const (
 	Debug   Level = "[DEBUG]"
 	Info    Level = "[INFO ]"

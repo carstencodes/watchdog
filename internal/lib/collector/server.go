@@ -26,7 +26,7 @@ var (
 )
 
 func init() {
-	flag.IntVar(&port, "port", defaultPort, "The tcp port to listen to")
+	flag.IntVar(&port, "server-port", defaultPort, "The tcp port to listen to")
 }
 
 func (col collectorImpl) StartServer(ctx *context.Context) error {
