@@ -1,3 +1,4 @@
 watchdog
 .idea
 bin/
+dist/
