@@ -24,9 +24,9 @@ run: build
 
 clean:
 	go clean
-	rm ${BINARY_NAME}-darwin
-	rm ${BINARY_NAME}-linux
-	rm ${BINARY_NAME}-windows.exe
+	rm ./bin/${BINARY_NAME}-darwin
+	rm ./bin/${BINARY_NAME}-linux
+	rm ./bin/${BINARY_NAME}-windows.exe
 
 test:
 	go test ./...
