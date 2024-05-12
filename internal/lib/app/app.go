@@ -36,8 +36,13 @@ type appServices struct {
 
 func NewApp() (*App, error) {
 	details := common.ApplicationInfo()
+	err := setupConfiguration()
+	if err != nil {
+		return nil, err
+	}
 
-	lg, err := watchLog.CreateLog(details)
+	var lg watchLog.Log
+	lg, err = watchLog.CreateLog(details)
 	if err != nil {
 		return nil, err
 	}
