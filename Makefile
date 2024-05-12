@@ -35,26 +35,26 @@ build: build/windows build/linux build/darwin
 build/darwin: build/darwin/amd64 build/darwin/arm64
 
 build/darwin/amd64:
-	GOARCH=amd64 GOOS=darwin go build -o ./bin/${BINARY_NAME}-darwin-amd64 ${LINKER_FLAGS} cmd/watchdog/main.go
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -o ./bin/${BINARY_NAME}-darwin-amd64 ${LINKER_FLAGS} cmd/watchdog/main.go
 
 build/darwin/arm64:
-	GOARCH=arm64 GOOS=darwin go build -o ./bin/${BINARY_NAME}-darwin-arm64 ${LINKER_FLAGS} cmd/watchdog/main.go
+	CGO_ENABLED=0 GOARCH=arm64 GOOS=darwin go build -o ./bin/${BINARY_NAME}-darwin-arm64 ${LINKER_FLAGS} cmd/watchdog/main.go
 
 build/linux: build/linux/386 build/linux/amd64 build/linux/arm64
 
 build/linux/386:
-	GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux-386 ${LINKER_FLAGS} cmd/watchdog/main.go
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux-386 ${LINKER_FLAGS} cmd/watchdog/main.go
 
 build/linux/amd64:
-	GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux-amd64 ${LINKER_FLAGS} cmd/watchdog/main.go
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux-amd64 ${LINKER_FLAGS} cmd/watchdog/main.go
 
 build/linux/arm64:
-	GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux-arm64 ${LINKER_FLAGS} cmd/watchdog/main.go
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o ./bin/${BINARY_NAME}-linux-arm64 ${LINKER_FLAGS} cmd/watchdog/main.go
 
 build/windows: build/windows/amd64
 
 build/windows/amd64:
-	GOARCH=amd64 GOOS=windows go build -o ./bin/${BINARY_NAME}-windows-amd64.exe ${LINKER_FLAGS} cmd/watchdog/main.go
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=windows go build -o ./bin/${BINARY_NAME}-windows-amd64.exe ${LINKER_FLAGS} cmd/watchdog/main.go
 
 run:
 	go run -ldflags "${_LD_FLAG_COPYRIGHT_YEAR} -X ${_LD_DETAILS_MODULE}.version=${_LD_FLAG_VALUE_VERSION}-dev" ./cmd/watchdog/main.go

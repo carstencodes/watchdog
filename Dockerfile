@@ -10,7 +10,7 @@ COPY . ./
 
 RUN make dist
 
-FROM debian:bookworm-slim AS base-layer
+FROM scratch AS base-layer
 
 STOPSIGNAL SIGINT
 
