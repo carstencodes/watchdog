@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.23.5
 
 require (
-	github.com/docker/docker v26.1.2+incompatible
+	github.com/docker/docker v26.1.5+incompatible
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-openapi/runtime v0.28.0
 	github.com/gotify/go-api-client/v2 v2.0.4
