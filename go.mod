@@ -5,8 +5,8 @@ go 1.23.0
 toolchain go1.24.3
 
 require (
-	github.com/docker/docker v28.1.1+incompatible
-	github.com/go-co-op/gocron/v2 v2.16.2
+	github.com/docker/docker v28.2.0+incompatible
+	github.com/go-co-op/gocron v1.37.0
 	github.com/go-co-op/gocron/v2 v2.16.2
 	github.com/go-openapi/runtime v0.28.0
 	github.com/gotify/go-api-client/v2 v2.0.4
@@ -20,6 +20,8 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/containerd/errdefs v1.0.0 // indirect
+	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
