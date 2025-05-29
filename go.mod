@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.24.3
 
 require (
-	github.com/docker/docker v28.2.0+incompatible
+	github.com/docker/docker v28.2.1+incompatible
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-co-op/gocron/v2 v2.16.2
 	github.com/go-openapi/runtime v0.28.0
