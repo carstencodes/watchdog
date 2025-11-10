@@ -7,7 +7,7 @@ toolchain go1.25.4
 require (
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/go-co-op/gocron v1.37.0
-	github.com/go-co-op/gocron/v2 v2.17.0
+	github.com/go-co-op/gocron/v2 v2.18.0
 	github.com/go-openapi/runtime v0.29.2
 	github.com/gotify/go-api-client/v2 v2.0.4
 	github.com/prometheus/client_golang v1.23.2
