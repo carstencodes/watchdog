@@ -6,9 +6,9 @@ toolchain go1.26.2
 
 require (
 	github.com/docker/docker v28.5.2+incompatible
+	github.com/go-co-op/gocron v1.37.0
 	github.com/go-co-op/gocron/v2 v2.21.1
-	github.com/go-co-op/gocron/v2 v2.21.1
-	github.com/go-openapi/runtime v0.29.4
+	github.com/go-openapi/runtime v0.29.5
 	github.com/gotify/go-api-client/v2 v2.0.4
 	github.com/prometheus/client_golang v1.23.2
 )
@@ -35,7 +35,7 @@ require (
 	github.com/go-openapi/jsonreference v0.21.5 // indirect
 	github.com/go-openapi/loads v0.23.3 // indirect
 	github.com/go-openapi/spec v0.22.4 // indirect
-	github.com/go-openapi/strfmt v0.26.1 // indirect
+	github.com/go-openapi/strfmt v0.26.2 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-openapi/swag/conv v0.26.0 // indirect
 	github.com/go-openapi/swag/fileutils v0.26.0 // indirect
@@ -79,12 +79,12 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/mod v0.34.0 // indirect
+	golang.org/x/net v0.53.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
-	golang.org/x/tools v0.42.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
