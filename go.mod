@@ -2,7 +2,7 @@ module github.com/carstencodes/watchdog
 
 go 1.25.0
 
-toolchain go1.26.4
+toolchain go1.26.5
 
 require (
 	github.com/docker/docker v28.5.2+incompatible
