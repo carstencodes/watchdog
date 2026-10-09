@@ -2,11 +2,11 @@ module github.com/carstencodes/watchdog
 
 go 1.26.0
 
-toolchain go1.27.1
+toolchain go1.27.2
 
 require (
 	github.com/docker/docker v28.5.2+incompatible
-	github.com/go-co-op/gocron/v2 v2.22.0
+	github.com/go-co-op/gocron v1.37.0
 	github.com/go-co-op/gocron/v2 v2.22.0
 	github.com/go-openapi/runtime v0.33.3
 	github.com/gotify/go-api-client/v2 v2.0.4
